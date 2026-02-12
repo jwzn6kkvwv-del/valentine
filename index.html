@@ -8,13 +8,16 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
+  body, html {
     min-height: 100vh;
+    overflow: hidden;
+  }
+
+  body {
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Quicksand', sans-serif;
-    overflow: hidden;
     background: #1a0810;
   }
 
@@ -402,6 +405,9 @@
 
 <div class="confetti-container" id="confettiContainer"></div>
 
+<!-- Invisible cage: the No button gets moved here when it escapes -->
+<div id="noCage" style="position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;pointer-events:none;z-index:50;"></div>
+
 <script>
   // Floating elements
   const heartsBg = document.getElementById('heartsBg');
@@ -457,35 +463,36 @@
   function moveNoButton() {
     noAttempts++;
 
-    // First hover: pull out of normal flow
+    // First hover: move button into the cage container
     if (!escaped) {
-      const rect = btnNo.getBoundingClientRect();
-      btnNo.style.position = 'fixed';
-      btnNo.style.left = rect.left + 'px';
-      btnNo.style.top = rect.top + 'px';
+      var cage = document.getElementById('noCage');
+      cage.appendChild(btnNo);
+      btnNo.style.position = 'absolute';
       btnNo.style.margin = '0';
-      btnNo.style.zIndex = '50';
+      btnNo.style.pointerEvents = 'auto';
       escaped = true;
     }
 
-    // Safe zone: 5% to 75% of viewport width, 5% to 85% of viewport height
-    // This guarantees the button + its text never clips outside
-    var safeLeft = window.innerWidth * 0.05;
-    var safeRight = window.innerWidth * 0.75;
-    var safeTop = window.innerHeight * 0.05;
-    var safeBottom = window.innerHeight * 0.85;
-    var newX = safeLeft + Math.random() * (safeRight - safeLeft);
-    var newY = safeTop + Math.random() * (safeBottom - safeTop);
+    // Change text FIRST so button has its final size
+    var idx = noAttempts % funTexts.length;
+    btnNo.textContent = funTexts[idx];
+
+    // Measure after text change
+    var btnW = btnNo.offsetWidth;
+    var btnH = btnNo.offsetHeight;
+
+    // Position randomly but always 30px inside the viewport edges
+    var pad = 30;
+    var maxX = window.innerWidth - btnW - pad;
+    var maxY = window.innerHeight - btnH - pad;
+    var newX = pad + Math.floor(Math.random() * Math.max(1, maxX - pad));
+    var newY = pad + Math.floor(Math.random() * Math.max(1, maxY - pad));
 
     btnNo.style.left = newX + 'px';
     btnNo.style.top = newY + 'px';
 
-    // Cycle through fun texts
-    const idx = noAttempts % funTexts.length;
-    btnNo.textContent = funTexts[idx];
-
     // Yes button grows slightly
-    const scale = 1 + noAttempts * 0.04;
+    var scale = 1 + noAttempts * 0.04;
     btnYes.style.transform = 'scale(' + Math.min(scale, 1.35) + ')';
   }
 
@@ -496,7 +503,7 @@
   btnYes.addEventListener('click', function() {
     document.getElementById('questionScreen').style.display = 'none';
     // Hide the escaped No button
-    if (escaped) btnNo.style.display = 'none';
+    if (escaped) document.getElementById('noCage').style.display = 'none';
     document.getElementById('yesScreen').style.display = 'flex';
     launchConfetti();
   });
