@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #0b0b0f; }
+      :root {
+        --ink: #0b0b0f; --paper: #f5f2ea; --orange: #ff4d2e; --violet: #7a5cff; --lime: #c6ff3d;
+      }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background: var(--ink); }
+      .scene { position: absolute; inset: 0; overflow: hidden; }
+      .mono { font-family: monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+
+      /* ---------- scene 1 : kinetic type ---------- */
+      #s1 { background: var(--ink); }
+      .line { position: absolute; left: 120px; height: 250px; overflow: hidden; font-size: 250px; line-height: 250px; font-weight: 900; letter-spacing: -0.04em; text-transform: uppercase; white-space: nowrap; }
+      .line .ch { display: inline-block; }
+      #l1 { top: 190px; color: var(--paper); }
+      #l2 { top: 410px; color: var(--ink); -webkit-text-stroke: 5px var(--paper); }
+      #l3 { top: 630px; color: var(--orange); }
+      #s1-disc { position: absolute; right: 180px; top: 200px; width: 560px; height: 560px; border-radius: 50%; background: var(--orange); }
+      #s1-sq { position: absolute; right: 300px; top: 320px; width: 320px; height: 320px; border: 6px solid var(--paper); }
+      #s1-bar { position: absolute; left: 120px; top: 150px; width: 260px; height: 10px; background: var(--violet); }
+      #s1-tag { position: absolute; right: 120px; bottom: 130px; font-size: 26px; color: var(--paper); }
+
+      /* ---------- scene 2 : rhythm grid ---------- */
+      #s2 { background: var(--paper); }
+      .dot { position: absolute; width: 56px; height: 56px; border-radius: 50%; }
+      #s2-word { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 330px; font-weight: 900; letter-spacing: -0.05em; color: var(--ink); }
+      #s2-word span { display: inline-block; }
+
+      /* ---------- scene 3 : data ---------- */
+      #s3 { background: var(--ink); }
+      #s3-num { position: absolute; left: 110px; top: 250px; font-size: 380px; line-height: 380px; font-weight: 900; letter-spacing: -0.05em; color: var(--orange); white-space: nowrap; }
+      #s3-num small { font-size: 150px; letter-spacing: 0; color: var(--paper); }
+      #s3-label { position: absolute; left: 124px; top: 190px; font-size: 28px; color: var(--paper); }
+      #s3-sub { position: absolute; left: 124px; top: 670px; font-size: 26px; color: var(--violet); }
+      .bar { position: absolute; width: 52px; bottom: 180px; background: var(--paper); }
+      #s3-svg { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+      #s3-axis { position: absolute; left: 980px; width: 830px; bottom: 178px; height: 4px; background: var(--paper); }
+
+      /* ---------- scene 4 : cards ---------- */
+      #s4 { background: var(--violet); }
+      .strip { position: absolute; left: 0; white-space: nowrap; font-size: 130px; line-height: 130px; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; }
+      #st1 { top: 110px; color: var(--paper); }
+      #st2 { top: 850px; color: var(--violet); -webkit-text-stroke: 3px var(--paper); }
+      #s4-stage { position: absolute; inset: 0; perspective: 1400px; }
+      .card { position: absolute; top: 290px; width: 480px; height: 520px; padding: 44px; overflow: hidden; }
+      #c1 { left: 200px; background: var(--paper); color: var(--ink); }
+      #c2 { left: 720px; background: var(--ink); color: var(--paper); }
+      #c3 { left: 1240px; background: var(--orange); color: var(--ink); }
+      .card .n { font-size: 26px; }
+      .card .t { position: absolute; left: 44px; bottom: 40px; font-size: 76px; line-height: 76px; font-weight: 900; letter-spacing: -0.03em; }
+      .card .g { position: absolute; }
+
+      /* ---------- scene 5 : sting ---------- */
+      #s5 { background: var(--ink); }
+      #s5-svg { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+      #s5-name { position: absolute; left: 0; right: 0; top: 850px; text-align: center; font-size: 96px; font-weight: 900; color: var(--paper); letter-spacing: 0.3em; padding-left: 0.3em; }
+      #s5-role { position: absolute; left: 0; right: 0; top: 968px; text-align: center; font-size: 26px; color: var(--lime); }
+
+      /* ---------- scene 6 : end card ---------- */
+      #s6 { background: var(--lime); color: var(--ink); }
+      .big { position: absolute; left: 110px; height: 270px; overflow: hidden; font-size: 250px; line-height: 270px; font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; white-space: nowrap; }
+      .big .ch { display: inline-block; }
+      #b1 { top: 190px; }
+      #b2 { top: 450px; color: var(--lime); -webkit-text-stroke: 5px var(--ink); }
+      #chips { position: absolute; left: 116px; top: 780px; display: flex; gap: 20px; }
+      .chip { padding: 18px 30px; border: 4px solid var(--ink); border-radius: 60px; font-size: 26px; font-weight: 700; }
+      .chip.f { background: var(--ink); color: var(--lime); }
+      #s6-foot { position: absolute; left: 116px; top: 920px; font-size: 26px; }
+
+      /* ---------- persistent chrome ---------- */
+      #vig { position: absolute; inset: 0; z-index: 40; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%); }
+      #hud { position: absolute; inset: 0; z-index: 60; color: #fff; pointer-events: none; }
+      #hud .tl { position: absolute; left: 56px; top: 46px; font-size: 22px; font-weight: 700; }
+      #hud .tr { position: absolute; right: 56px; top: 46px; font-size: 22px; font-weight: 700; }
+      #hud .prog { position: absolute; left: 56px; right: 56px; bottom: 48px; height: 4px; background: rgba(128,128,128,0.35); }
+      #hud .fill { position: absolute; left: 0; top: 0; bottom: 0; right: 0; background: currentColor; transform-origin: left center; }
+      .wipe { position: absolute; inset: 0; z-index: 80; }
+      #fade { position: absolute; inset: 0; z-index: 90; background: #000; opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1920" data-height="1080">
+
+      <!-- SCENE 1 -->
+      <div id="s1" class="clip scene" data-start="0" data-duration="2.6" data-track-index="0">
+        <div id="s1-disc"></div>
+        <div id="s1-sq"></div>
+        <div id="s1-bar"></div>
+        <div id="l1" class="line">I make</div>
+        <div id="l2" class="line">things</div>
+        <div id="l3" class="line">move.</div>
+        <div id="s1-tag" class="mono">Motion Design Showreel / 2026</div>
+      </div>
+
+      <!-- SCENE 2 -->
+      <div id="s2" class="clip scene" data-start="2.6" data-duration="2.6" data-track-index="0">
+        <div id="s2-grid"></div>
+        <div id="s2-word">RHYTHM</div>
+      </div>
+
+      <!-- SCENE 3 -->
+      <div id="s3" class="clip scene" data-start="5.2" data-duration="2.6" data-track-index="0">
+        <div id="s3-label" class="mono">Audience retention</div>
+        <div id="s3-num"><span id="s3-val">0.0</span><small>%</small></div>
+        <div id="s3-sub" class="mono">Data, made to feel alive</div>
+        <div id="s3-axis"></div>
+        <div id="s3-bars"></div>
+        <svg id="s3-svg" viewBox="0 0 1920 1080">
+          <path id="s3-line" fill="none" stroke="#ff4d2e" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
+          <circle id="s3-dot" r="20" fill="#c6ff3d" cx="0" cy="0" />
+          <circle id="s3-halo" r="20" fill="none" stroke="#c6ff3d" stroke-width="4" cx="0" cy="0" />
+        </svg>
+      </div>
+
+      <!-- SCENE 4 -->
+      <div id="s4" class="clip scene" data-start="7.8" data-duration="2.6" data-track-index="0">
+        <div id="st1" class="strip">Brand &bull; Type &bull; Motion &bull; Space &bull; Brand &bull; Type &bull; Motion &bull; Space &bull; Brand &bull; Type &bull; Motion &bull; Space &bull;</div>
+        <div id="st2" class="strip">Rhythm &bull; Light &bull; Depth &bull; Craft &bull; Rhythm &bull; Light &bull; Depth &bull; Craft &bull; Rhythm &bull; Light &bull; Depth &bull; Craft &bull;</div>
+        <div id="s4-stage">
+          <div id="c1" class="card">
+            <div class="n mono">01</div>
+            <div id="c1-g" class="g" style="right:44px;top:120px;width:200px;height:200px;border-radius:50%;background:#7a5cff"></div>
+            <div class="t">Brand</div>
+          </div>
+          <div id="c2" class="card">
+            <div class="n mono">02</div>
+            <div id="c2-g" class="g" style="right:60px;top:130px;width:170px;height:170px;background:#c6ff3d"></div>
+            <div class="t">Motion</div>
+          </div>
+          <div id="c3" class="card">
+            <div class="n mono">03</div>
+            <div id="c3-g" class="g" style="left:44px;top:150px;width:390px;height:150px;"></div>
+            <div class="t">System</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE 5 -->
+      <div id="s5" class="clip scene" data-start="10.4" data-duration="2.5" data-track-index="0">
+        <svg id="s5-svg" viewBox="0 0 1920 1080">
+          <g id="s5-rays"></g>
+          <circle id="s5-r1" cx="960" cy="400" r="150" fill="none" stroke="#7a5cff" stroke-width="6" />
+          <circle id="s5-r2" cx="960" cy="400" r="150" fill="none" stroke="#c6ff3d" stroke-width="4" />
+          <circle id="s5-arc" cx="960" cy="400" r="150" fill="none" stroke="#ff4d2e" stroke-width="44" stroke-linecap="round" />
+          <circle id="s5-dot" cx="960" cy="400" r="38" fill="#f5f2ea" />
+        </svg>
+        <div id="s5-name">CLAUDE</div>
+        <div id="s5-role" class="mono">Motion designer &middot; Creative technologist</div>
+      </div>
+
+      <!-- SCENE 6 -->
+      <div id="s6" class="clip scene" data-start="12.9" data-duration="2.1" data-track-index="0">
+        <div id="b1" class="big">Available</div>
+        <div id="b2" class="big">for hire.</div>
+        <div id="chips">
+          <div class="chip f">Kinetic type</div>
+          <div class="chip">Data viz</div>
+          <div class="chip f">3D &amp; space</div>
+          <div class="chip">Brand systems</div>
+        </div>
+        <div id="s6-foot" class="mono">Built in HTML &middot; rendered with HyperFrames</div>
+      </div>
+
+      <div id="vig"></div>
+      <div id="hud">
+        <div class="tl mono">Claude &mdash; Motion Reel &rsquo;26</div>
+        <div class="tr mono" id="tc">00:00:00</div>
+        <div class="prog"><div class="fill" id="pfill"></div></div>
+      </div>
+
+      <div id="w1" class="wipe" style="background:#ff4d2e"></div>
+      <div id="w2" class="wipe" style="background:#0b0b0f"></div>
+      <div id="w3" class="wipe" style="background:#c6ff3d"></div>
+      <div id="w4" class="wipe" style="background:#f5f2ea"></div>
+      <div id="w5" class="wipe" style="background:#7a5cff"></div>
+      <div id="fade"></div>
+    </div>
+
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const NS = "http://www.w3.org/2000/svg";
+      const tl = gsap.timeline({ paused: true });
+
+      // seeded PRNG (deterministic)
+      let seed = 7;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
+
+      const splitChars = (el) => {
+        const txt = el.textContent;
+        el.textContent = "";
+        return [...txt].map((c) => {
+          const s = document.createElement("span");
+          s.className = "ch";
+          s.textContent = c === " " ? " " : c;
+          el.appendChild(s);
+          return s;
+        });
+      };
+
+      /* ============ persistent: HUD + wipes ============ */
+      const clock = { t: 0 };
+      tl.to(clock, {
+        t: 15, duration: 15, ease: "none",
+        onUpdate() {
+          const f = Math.floor(clock.t * 30);
+          const p = (n) => String(n).padStart(2, "0");
+          $("#tc").textContent = p(Math.floor(f / 1800)) + ":" + p(Math.floor(f / 30) % 60) + ":" + p(f % 30);
+        },
+      }, 0);
+      tl.fromTo("#pfill", { scaleX: 0 }, { scaleX: 1, duration: 15, ease: "none" }, 0);
+
+      const bounds = [2.6, 5.2, 7.8, 10.4, 12.9];
+      bounds.forEach((b, i) => {
+        const w = "#w" + (i + 1);
+        tl.fromTo(w, { xPercent: -101 }, { xPercent: 0, duration: 0.3, ease: "power3.in" }, b - 0.3);
+        tl.to(w, { xPercent: 101, duration: 0.34, ease: "power3.out" }, b);
+      });
+      [[0, "#ffffff"], [2.6, "#0b0b0f"], [5.2, "#ffffff"], [12.9, "#0b0b0f"]].forEach(([t, c]) => tl.set("#hud", { color: c }, t));
+      tl.fromTo("#fade", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.in" }, 14.6);
+
+      /* ============ SCENE 1 ============ */
+      const c1 = splitChars($("#l1")), c2 = splitChars($("#l2")), c3 = splitChars($("#l3"));
+      tl.fromTo("#s1-disc", { scale: 0 }, { scale: 1, duration: 0.9, ease: "expo.out" }, 0.15);
+      tl.fromTo("#s1-disc", { x: 0 }, { x: -60, duration: 2.2, ease: "sine.inOut", immediateRender: false }, 0.3);
+      tl.fromTo("#s1-sq", { rotation: -90, scale: 0.2, opacity: 0 }, { rotation: 45, scale: 1, opacity: 1, duration: 1.4, ease: "expo.out" }, 0.3);
+      tl.fromTo("#s1-sq", { rotation: 45 }, { rotation: 135, duration: 0.9, ease: "power2.inOut", immediateRender: false }, 1.7);
+      tl.fromTo("#s1-bar", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.7, ease: "expo.out" }, 0.1);
+      [[c1, 0.1], [c2, 0.3], [c3, 0.5]].forEach(([chars, t0], li) => {
+        tl.fromTo(chars, { yPercent: 115, rotation: 8 }, { yPercent: 0, rotation: 0, duration: 0.7, ease: li === 2 ? "back.out(2.4)" : "expo.out", stagger: 0.045 }, t0);
+      });
+      tl.fromTo(c3, { scaleY: 1 }, { scaleY: 1.12, transformOrigin: "50% 100%", duration: 0.18, ease: "power2.out", stagger: 0.05, yoyo: true, repeat: 1 }, 1.25);
+      tl.fromTo("#s1-tag", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, 0.9);
+      // slow push
+      tl.fromTo("#s1 .line", { x: 0 }, { x: 40, duration: 2.3, ease: "none", immediateRender: false }, 0.3);
+
+      /* ============ SCENE 2 ============ */
+      const grid = $("#s2-grid");
+      const dots = [];
+      for (let j = 0; j < 9; j++) for (let i = 0; i < 16; i++) {
+        const d = document.createElement("div");
+        d.className = "dot";
+        d.style.left = 60 + i * 120 - 28 + "px";
+        d.style.top = 60 + j * 120 - 28 + "px";
+        const dist = Math.hypot(i - 7.5, j - 4) / 9;
+        const k = Math.min(1, dist);
+        d.style.background = `rgb(${Math.round(255 + (122 - 255) * k)},${Math.round(77 + (92 - 77) * k)},${Math.round(46 + (255 - 46) * k)})`;
+        d._cx = 960 - (60 + i * 120); d._cy = 540 - (60 + j * 120);
+        grid.appendChild(d); dots.push(d);
+      }
+      const S2 = 2.6;
+      tl.fromTo(dots, { scale: 0 }, { scale: 1, duration: 0.5, ease: "back.out(2)", stagger: { grid: [16, 9], from: "center", amount: 0.55 } }, S2 + 0.1);
+      tl.to(dots, { scale: 0.35, duration: 0.35, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: { grid: [16, 9], from: "center", amount: 0.5 } }, S2 + 0.8);
+      tl.to(dots, { borderRadius: "0%", rotation: 90, duration: 0.45, ease: "power3.inOut", stagger: { grid: [16, 9], from: "edges", amount: 0.3 } }, S2 + 1.55);
+      dots.forEach((d) => tl.to(d, { x: d._cx, y: d._cy, scale: 0, duration: 0.55, ease: "power3.in" }, S2 + 1.95));
+      const w2 = splitChars($("#s2-word"));
+      tl.fromTo(w2, { scale: 0, rotation: -25, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: 0.6, ease: "back.out(2.2)", stagger: 0.06 }, S2 + 2.05);
+
+      /* ============ SCENE 3 ============ */
+      const S3 = 5.2;
+      const hs = [180, 260, 220, 340, 300, 420, 380, 520, 470, 640];
+      const bars = $("#s3-bars"); const pts = [];
+      hs.forEach((h, i) => {
+        const b = document.createElement("div");
+        b.className = "bar"; b.style.left = 1010 + i * 78 + "px"; b.style.height = h + "px";
+        b.style.opacity = i === hs.length - 1 ? 1 : 0.9;
+        bars.appendChild(b);
+        pts.push([1010 + i * 78 + 26, 900 - h - 46]);
+        tl.fromTo(b, { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.7, ease: "elastic.out(1,0.6)" }, S3 + 0.25 + i * 0.06);
+      });
+      const line = $("#s3-line");
+      line.setAttribute("d", "M" + pts.map((p) => p.join(",")).join(" L"));
+      const len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      tl.fromTo(line, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.3, ease: "power2.inOut" }, S3 + 0.7);
+      const prog = { p: 0 };
+      const place = () => {
+        const q = line.getPointAtLength(prog.p * len);
+        ["#s3-dot", "#s3-halo"].forEach((s) => { $(s).setAttribute("cx", q.x); $(s).setAttribute("cy", q.y); });
+      };
+      tl.fromTo(prog, { p: 0 }, { p: 1, duration: 1.3, ease: "power2.inOut", onUpdate: place }, S3 + 0.7);
+      tl.fromTo("#s3-halo", { scale: 1, opacity: 0.9, transformOrigin: "50% 50%" }, { scale: 2.6, opacity: 0, duration: 0.5, ease: "power2.out" }, S3 + 2.0);
+      tl.fromTo("#s3-dot", { opacity: 0 }, { opacity: 1, duration: 0.15 }, S3 + 0.7);
+      tl.fromTo("#s3-axis", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, S3 + 0.1);
+      const cnt = { v: 0 };
+      tl.fromTo(cnt, { v: 0 }, { v: 98.6, duration: 1.7, ease: "power3.out", onUpdate() { $("#s3-val").textContent = cnt.v.toFixed(1); } }, S3 + 0.2);
+      tl.fromTo("#s3-label", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, S3 + 0.1);
+      tl.fromTo("#s3-sub", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out" }, S3 + 0.9);
+      tl.fromTo("#s3-num", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "expo.out" }, S3 + 0.1);
+
+      /* ============ SCENE 4 ============ */
+      const S4 = 7.8;
+      tl.fromTo("#st1", { x: 0 }, { x: -1500, duration: 2.6, ease: "none" }, S4);
+      tl.fromTo("#st2", { x: -1500 }, { x: 0, duration: 2.6, ease: "none" }, S4);
+      [["#c1", 0.1], ["#c2", 0.25], ["#c3", 0.4]].forEach(([c, d], i) => {
+        tl.fromTo(c, { rotationY: -100, y: 120, opacity: 0, z: -300 }, { rotationY: 0, y: 0, opacity: 1, z: 0, duration: 0.85, ease: "expo.out" }, S4 + d);
+        tl.fromTo(c, { y: 0 }, { y: -26 - i * 6, duration: 1.3, ease: "sine.inOut", yoyo: true, repeat: 1, immediateRender: false }, S4 + 1.0);
+        tl.fromTo(c, { rotationY: 0 }, { rotationY: -12 + i * 12, duration: 1.4, ease: "sine.inOut", immediateRender: false }, S4 + 1.0);
+      });
+      tl.fromTo("#c1-g", { scale: 0 }, { scale: 1, duration: 0.8, ease: "elastic.out(1,0.5)" }, S4 + 0.6);
+      tl.fromTo("#c1-g", { x: 0 }, { x: -50, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 1, immediateRender: false }, S4 + 1.2);
+      tl.fromTo("#c2-g", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.8, ease: "back.out(2)" }, S4 + 0.75);
+      tl.fromTo("#c2-g", { rotation: 0 }, { rotation: 180, duration: 1.4, ease: "power2.inOut", immediateRender: false }, S4 + 1.6);
+      // card 3 : equalizer bars
+      const eq = $("#c3-g"); const eqb = [];
+      [0.5, 1, 0.65, 0.9, 0.4, 0.8, 0.55].forEach((h, i) => {
+        const b = document.createElement("div");
+        b.style.cssText = `position:absolute;bottom:0;left:${i * 58}px;width:40px;height:${h * 150}px;background:#0b0b0f`;
+        eq.appendChild(b); eqb.push(b);
+      });
+      tl.fromTo(eqb, { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.6, ease: "back.out(2)", stagger: 0.06 }, S4 + 0.9);
+      tl.to(eqb, { scaleY: 0.35, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 3, stagger: 0.07 }, S4 + 1.5);
+
+      /* ============ SCENE 5 ============ */
+      const S5 = 10.4;
+      const rays = $("#s5-rays");
+      const rayEls = [];
+      for (let i = 0; i < 56; i++) {
+        const L = 90 + rnd() * 150;
+        const l = document.createElementNS(NS, "line");
+        l.setAttribute("x1", 960 + 250); l.setAttribute("y1", 400);
+        l.setAttribute("x2", 960 + 250 + L); l.setAttribute("y2", 400);
+        l.setAttribute("stroke", ["#ff4d2e", "#f5f2ea", "#7a5cff", "#c6ff3d"][i % 4]);
+        l.setAttribute("stroke-width", 4 + Math.floor(rnd() * 5));
+        l.setAttribute("stroke-linecap", "round");
+        l.setAttribute("transform", `rotate(${(i * 360) / 56} 960 400)`);
+        l.style.strokeDasharray = L + " " + L * 3;
+        rays.appendChild(l); rayEls.push([l, L]);
+      }
+      rayEls.forEach(([l, L], i) => {
+        tl.fromTo(l, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 0.35, ease: "power3.out" }, S5 + 0.85 + (i % 8) * 0.012);
+        tl.to(l, { strokeDashoffset: -L * 1.05, duration: 0.5, ease: "power2.in" }, S5 + 1.25 + (i % 8) * 0.012);
+      });
+      const circ = 2 * Math.PI * 150, arcL = circ * 0.78;
+      const arc = $("#s5-arc");
+      arc.style.strokeDasharray = arcL + " " + circ;
+      tl.fromTo(arc, { strokeDashoffset: arcL }, { strokeDashoffset: 0, duration: 0.9, ease: "power3.inOut" }, S5 + 0.1);
+      tl.fromTo(arc, { rotation: -200, svgOrigin: "960 400" }, { rotation: 20, svgOrigin: "960 400", duration: 1.4, ease: "expo.out" }, S5 + 0.1);
+      tl.fromTo("#s5-dot", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.55, ease: "elastic.out(1,0.45)" }, S5 + 0.7);
+      tl.fromTo("#s5-r1", { scale: 0.4, opacity: 1, transformOrigin: "50% 50%" }, { scale: 2.6, opacity: 0, duration: 0.9, ease: "power2.out" }, S5 + 0.85);
+      tl.fromTo("#s5-r2", { scale: 0.4, opacity: 1, transformOrigin: "50% 50%" }, { scale: 3.4, opacity: 0, duration: 1.0, ease: "power2.out" }, S5 + 1.0);
+      tl.fromTo("#s5-svg", { scale: 1 }, { scale: 1.06, transformOrigin: "50% 50%", duration: 2.4, ease: "none" }, S5);
+      const nm = splitChars($("#s5-name"));
+      tl.fromTo(nm, { opacity: 0, y: 60, x: (i) => (i - 2.5) * 60 }, { opacity: 1, y: 0, x: 0, duration: 0.7, ease: "expo.out", stagger: 0.07 }, S5 + 0.9);
+      tl.fromTo("#s5-role", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, S5 + 1.4);
+
+      /* ============ SCENE 6 ============ */
+      const S6 = 12.9;
+      const b1 = splitChars($("#b1")), b2 = splitChars($("#b2"));
+      tl.fromTo(b1, { yPercent: 120, rotation: 10 }, { yPercent: 0, rotation: 0, duration: 0.7, ease: "expo.out", stagger: 0.04 }, S6 + 0.05);
+      tl.fromTo(b2, { yPercent: 120, rotation: -10 }, { yPercent: 0, rotation: 0, duration: 0.7, ease: "expo.out", stagger: 0.04 }, S6 + 0.25);
+      tl.fromTo(".chip", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2.5)", stagger: 0.1 }, S6 + 0.6);
+      tl.fromTo("#s6-foot", { opacity: 0 }, { opacity: 1, duration: 0.5 }, S6 + 1.1);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
